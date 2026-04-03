@@ -11,4 +11,6 @@
 - <ins>Questions to answer</ins>: Does the sentiment of the dialogue in an episode correlate to the IMDB rating for the episode? (Do different rating websites exhibit the same behavior, or are some more influenced by sentiment than others?) Does the frequency of a name being used in an episode correlate to the ratings for the episode? 
 
 **3. Whitman Campus trees**
-- I know that there is a database of (almost) all trees on the Whitman campus that, for each tree, includes its species name, family name, common name, leaf fall, and geographic coordinates. (I know that there is a )
+- I know that there is a dataset of (almost) all trees on the Whitman campus that, for each tree, includes its species name, family name, common name, leaf fall, and geographic coordinates. (I know that there is such a dataset because I have found an [unfinished GitHub project](https://github.com/Luckykhoza1/WhitmanTrees-Demo) that uses the dataset of over 6,000 trees.)
+- I can combine this dataset with things like data of campus building footprints (easily found in OpenStreetMap).
+- <ins>Questions to answer</ins>: Does the type of tree correlate to its distance from the closest building? Does the type of tree correlate to its location on campus?
