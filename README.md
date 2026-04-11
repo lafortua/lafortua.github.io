@@ -14,3 +14,9 @@
 - I know that there is a dataset of (almost) all trees on the Whitman campus that, for each tree, includes its species name, family name, common name, leaf fall, and geographic coordinates. (I know that there is such a dataset because I have found an [unfinished GitHub project](https://github.com/Luckykhoza1/WhitmanTrees-Demo) that uses the dataset of over 6,000 trees.)
 - I can combine this dataset with things like data of campus building footprints (easily found in OpenStreetMap).
 - <ins>Questions to answer</ins>: Does the type of tree correlate to its distance from the closest building? Does the type of tree correlate to its location on campus?
+
+## Week 10 Update
+- I have settled on doing word analysis of a TV show as my topic for the final project.
+- I will be doing this project by myself.
+- I am going to look at things like how often two words appear in the same line, the frequency of names throughout the series, etc.
+- I am either going to use a transcript for the TV show Cheers, or The Office. In preparation for this project I wrote a webcrawler using jsoup for Java to get all of the transcripts for Cheers from a TV show transcripts website. The program organized all of the lines into a single .csv file that, for each line, includes the season number, episode number, and episode title. However, some of the episodes have single letters swapped for others (for example, in some episode the letter "I" is replaced by "l"). 
