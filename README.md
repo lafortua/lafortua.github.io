@@ -27,3 +27,7 @@
     Which character's name appears in the same line as the word "beer" the most? (I suspect it would be the character named Norm, but perhaps it is one of the waiters or bartenders).
     Which character's name appears the most in lines that end with "!". What about "?".
     Does the sentiment of the lines change throughout the series? (Judging sentiment using automatic sentiment analysis.)
+
+## Week 11 Update
+- I decided to work with the transcripts of the TV show Cheers. While the data is not as available as for the TV show The Office, I enjoyed the challenge of compiling the data and cleaning it up.
+- I obtained data from two different sources. The first source was [this website](https://subslikescript.com/series/Cheers-83399) which gave me the transcripts of all episodes in the series. I wrote my own java code that uses the Jsoup library to download the individual lines directly from the website. In this step I recorded the line, the season and episode number, and the name of the episode. Last week I mentioned that there were some errors such as the letter "l" being in places where the letter "I" should be sometimes. I wrote my own java code that fixed many of these errors. I also got information from IMDb using Jsoup. This was more difficult however because the website doesn't just use html to work. I was able to easily 
