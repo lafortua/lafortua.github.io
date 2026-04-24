@@ -38,16 +38,17 @@
 <iframe
   src="Alaska_destinations_delays.html"
   width="100%"
-  height="600"
+  height="300"
   frameborder="0">
 </iframe>
 
 ## Week 12 Update
-
+- Since I started working with this dataset, I have been wondering if there really is a correlation between Norm and beer that is reflected purely in the dialogue. (In the show, Norm is a lover of beer.) I used a python function to determine the correlation after I had found the instances of each character's name as well as the word beer. I also widdened the range of lines that would be considered related to the character names. By that I mean that if Norm was mentioned in line 5, I would also include lines 4 and 6 as lines that are related to Norm. Also, for each character, I made sure to also include their last name when looking for instances of thier name appearing. 
+-
 <iframe
     src="beer_correlation.html"
     width="100%"
-    height="600"
+    height="300"
     frameborder="0">
 </iframe>
 
