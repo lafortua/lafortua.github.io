@@ -41,3 +41,13 @@
   height="600"
   frameborder="0">
 </iframe>
+
+## Week 12 Update
+
+<iframe
+    src="beer_correlation.html"
+    width="100%"
+    height="600"
+    frameborder="0">
+</iframe>
+
