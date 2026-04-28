@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Boids!</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden; /* Prevent scrollbars */
+      background: #fdf6e3;
+    }
+    #boidsCanvas {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="boidsCanvas"></canvas>
+
+  <script>
+    // ----------- Boid constants -----------
+    const BOID_COUNT = 20;          // Initial number of boids
+	const BOID_SIZE = 10;          // Length of the triangle
+    const ADD_BOID_COUNT = 10;     // Number of boids added each time we spawn more
+
+    // Movement & steering settings
+    const MAX_SPEED = 6;          // Max boid speed (pixels/frame)
+    const STEERING_STRENGTH = 0.05; // How quickly velocity adapts to approach the target
+    const SEPARATION_DISTANCE = 30; // Minimum distance to keep from other boids
+    const SEPARATION_STRENGTH = 0.05; // How strongly boids steer to avoid each other
+
+    // Cursor avoidance settings
+    const BASE_AVOID_DISTANCE = 50;  // If boids get within this range, they steer away from cursor
+    const BASE_AVOID_STRENGTH = 0.2; // Strength of repulsion away from the cursor
+    // When user is holding left mouse button, we amplify this repulsion
+    const AVOID_MULTIPLIER = 3;      // Multiplies both distance & strength
+
+    // For wandering when cursor leaves the window
+    // Boids will gather around a random target that changes when they get close.
+    let wanderTarget = { x: 0, y: 0 };
+    const WANDER_THRESHOLD = 100; // Distance from group center to target that triggers picking a new target
+
+    const canvas = document.getElementById('boidsCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // ----------- Canvas resizing -----------
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    // ----------- Mouse tracking -----------
+    let mouse = {
+      x: canvas.width / 2,
+      y: canvas.height / 2
+    };
+    let isMouseDown = false;   // tracks whether left mouse button is pressed
+    let cursorInside = false;   // tracks if cursor is inside window
+
+    canvas.addEventListener('mousemove', (e) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+    });
+    canvas.addEventListener('mousedown', () => {
+      isMouseDown = true;
+    });
+    canvas.addEventListener('mouseup', () => {
+      isMouseDown = false;
+    });
+
+    // Track mouse leaving by using a 'mouseout' on document
+    document.addEventListener('mouseout', (e) => {
+      // e.relatedTarget is the element we're moving toward.
+      // If it's null, we likely left the entire window.
+      if (!e.relatedTarget) {
+        cursorInside = false;
+        pickNewWanderTarget();
+      }
+    });
+
+    // We also set cursorInside = true whenever we move the mouse on the doc again.
+    document.addEventListener('mouseover', () => {
+      if (!cursorInside) {
+        cursorInside = true;
+      }
+    });
+
+    // ----------- Boid storage & initialization -----------
+    const boids = [];
+    for (let i = 0; i < BOID_COUNT; i++) {
+      spawnBoid();
+    }
+
+    // Add a keydown listener to spawn more boids on spacebar press
+    document.addEventListener('keydown', (e) => {
+      if (e.code === 'Space') {
+        e.preventDefault();
+        spawnMoreBoid();
+      }
+    });
+
+    function spawnBoid() {
+      boids.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        vx: (Math.random() - 0.5) * 2, // small random initial velocity
+        vy: (Math.random() - 0.5) * 2
+      });
+    }
+
+    function spawnMoreBoid() {
+      for (let i = 0; i < ADD_BOID_COUNT; i++) {
+        spawnBoid();
+      }
+    }
+
+    // Function to pick a new random wander target within the window
+    function pickNewWanderTarget() {
+      wanderTarget.x = Math.random() * canvas.width;
+      wanderTarget.y = Math.random() * canvas.height;
+    }
+
+    // Returns the average (center) position of all boids
+    function getGroupCenter() {
+      let sumX = 0;
+      let sumY = 0;
+      for (let b of boids) {
+        sumX += b.x;
+        sumY += b.y;
+      }
+      return {
+        x: sumX / boids.length,
+        y: sumY / boids.length
+      };
+    }
+
+    // ----------- Animation loop -----------
+    function update() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // If the cursor is outside, we check group center vs wanderTarget
+      if (!cursorInside) {
+        let center = getGroupCenter();
+        let cdx = wanderTarget.x - center.x;
+        let cdy = wanderTarget.y - center.y;
+        let cdist = Math.sqrt(cdx * cdx + cdy * cdy);
+        // If the group center is close to the wanderTarget, pick a new one
+        if (cdist < WANDER_THRESHOLD) {
+          pickNewWanderTarget();
+        }
+      }
+
+      // Determine dynamic avoidance range and strength
+      const avoidDistance = isMouseDown ? BASE_AVOID_DISTANCE * AVOID_MULTIPLIER : BASE_AVOID_DISTANCE;
+      const avoidStrength = isMouseDown ? BASE_AVOID_STRENGTH * AVOID_MULTIPLIER : BASE_AVOID_STRENGTH;
+
+      for (let i = 0; i < boids.length; i++) {
+        let b = boids[i];
+
+        if (cursorInside) {
+          // Distance from the boid to the cursor
+          let dx = mouse.x - b.x;
+          let dy = mouse.y - b.y;
+          let dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist > avoidDistance) {
+            // If outside the avoidance radius, steer gently toward the mouse
+            let desiredVx = (dx / dist) * MAX_SPEED;
+            let desiredVy = (dy / dist) * MAX_SPEED;
+            b.vx += (desiredVx - b.vx) * STEERING_STRENGTH;
+            b.vy += (desiredVy - b.vy) * STEERING_STRENGTH;
+          } else {
+            // If within the avoidance radius, steer away from the mouse
+            if (dist > 0) {
+              let repelFactor = ((avoidDistance - dist) / dist) * avoidStrength;
+              b.vx -= dx * repelFactor;
+              b.vy -= dy * repelFactor;
+            }
+          }
+        } else {
+          // Cursor is outside the window: boids wander toward a random target
+          let dx = wanderTarget.x - b.x;
+          let dy = wanderTarget.y - b.y;
+          let dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist > 0) {
+            let desiredVx = (dx / dist) * MAX_SPEED;
+            let desiredVy = (dy / dist) * MAX_SPEED;
+            b.vx += (desiredVx - b.vx) * STEERING_STRENGTH;
+            b.vy += (desiredVy - b.vy) * STEERING_STRENGTH;
+          }
+        }
+
+        // --- Separation from other boids to prevent crashing ---
+        for (let j = 0; j < boids.length; j++) {
+          if (i === j) continue; // skip self
+          let b2 = boids[j];
+          let dx2 = b.x - b2.x;
+          let dy2 = b.y - b2.y;
+          let dist2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);
+
+          if (dist2 < SEPARATION_DISTANCE && dist2 > 0) {
+            // The closer they are, the stronger the repulsion
+            let repulseFactor = SEPARATION_STRENGTH * (SEPARATION_DISTANCE - dist2) / dist2;
+            b.vx += dx2 * repulseFactor;
+            b.vy += dy2 * repulseFactor;
+          }
+        }
+
+        // --- Cap speed at MAX_SPEED ---
+        let speed = Math.sqrt(b.vx * b.vx + b.vy * b.vy);
+        if (speed > MAX_SPEED) {
+          b.vx = (b.vx / speed) * MAX_SPEED;
+          b.vy = (b.vy / speed) * MAX_SPEED;
+        }
+
+        // --- Update boid position ---
+        b.x += b.vx;
+        b.y += b.vy;
+
+        // --- Boundary checking so boids don't leave the window ---
+        if (b.x < 0) {
+          b.x = 0;
+          b.vx *= -1;
+        } else if (b.x > canvas.width) {
+          b.x = canvas.width;
+          b.vx *= -1;
+        }
+        if (b.y < 0) {
+          b.y = 0;
+          b.vy *= -1;
+        } else if (b.y > canvas.height) {
+          b.y = canvas.height;
+          b.vy *= -1;
+        }
+
+        // --- Draw boid ---
+        drawBoid(b);
+      }
+
+      requestAnimationFrame(update);
+    }
+
+    function drawBoid(boid) {
+      let angle = Math.atan2(boid.vy, boid.vx);
+	  let speed = Math.sqrt(boid.vx * boid.vx + boid.vy * boid.vy);
+	  let adjustedSize = BOID_SIZE / 2 + BOID_SIZE * 2 * (speed / MAX_SPEED);
+
+      ctx.save();
+      ctx.translate(boid.x, boid.y);
+      ctx.rotate(angle);
+      ctx.beginPath();
+      // Triangle with tip forward:
+      ctx.moveTo(adjustedSize, 0);               // Tip (forward)
+      ctx.lineTo(-BOID_SIZE, BOID_SIZE / 2);  // Back left
+      ctx.lineTo(-BOID_SIZE, -BOID_SIZE / 2); // Back right
+      ctx.closePath();
+      ctx.fillStyle = '#657b83';
+      ctx.fill();
+      ctx.restore();
+    }
+
+    // Start the animation
+    update();
+  </script>
+</body>
+</html>

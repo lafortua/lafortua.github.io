@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Maze Generator & Solver</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 20px;
+	  background: #fdf6e3;
+    }
+    canvas {
+      border: 1px solid '#657b83';
+      margin-top: 20px;
+    }
+    .controls {
+      margin-bottom: 20px;
+    }
+    input {
+      width: 60px;
+      margin: 0 10px;
+    }
+    button {
+      margin: 0 5px;
+    }
+    #searchProgress {
+      margin-top: 20px;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="mazeCanvas"></canvas>
+
+  
+
+  <script>
+    // Global variables used by both maze generation and solving.
+    const MAZE_WIDTH = 20;
+    const MAZE_HEIGHT = 20;
+    const SOLVER_DELAY_MS = 60;      // Increase this value to slow the solver further.
+    const NEXT_MAZE_DELAY_MS = 1200; // Pause after each solved maze before starting another.
+
+    let grid, cols, rows, cellSize, canvas, ctx;
+    let solverTimeout = null;
+    let loopTimeout = null;
+
+    // The Cell class represents one cell in the maze.
+    class Cell {
+      constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        // Walls: [top, right, bottom, left]
+        this.walls = [true, true, true, true];
+        this.visited = false;      // Used in maze generation.
+        this.solverVisited = false; // Used in maze solving.
+      }
+
+      // Returns a random unvisited neighbor (for maze generation)
+      getUnvisitedNeighbor(grid, cols, rows) {
+        const neighbors = [];
+        if (this.y > 0 && !grid[this.x][this.y - 1].visited)
+          neighbors.push(grid[this.x][this.y - 1]);       // Top
+        if (this.x < cols - 1 && !grid[this.x + 1][this.y].visited)
+          neighbors.push(grid[this.x + 1][this.y]); // Right
+        if (this.y < rows - 1 && !grid[this.x][this.y + 1].visited)
+          neighbors.push(grid[this.x][this.y + 1]); // Bottom
+        if (this.x > 0 && !grid[this.x - 1][this.y].visited)
+          neighbors.push(grid[this.x - 1][this.y]);       // Left
+
+        if (neighbors.length > 0) {
+          return neighbors[Math.floor(Math.random() * neighbors.length)];
+        } else {
+          return undefined;
+        }
+      }
+    }
+
+    // Remove the walls between two adjacent cells.
+    function removeWalls(a, b) {
+      const x = a.x - b.x;
+      if (x === 1) { // a is to the right of b
+        a.walls[3] = false;
+        b.walls[1] = false;
+      } else if (x === -1) { // a is to the left of b
+        a.walls[1] = false;
+        b.walls[3] = false;
+      }
+      const y = a.y - b.y;
+      if (y === 1) { // a is below b
+        a.walls[0] = false;
+        b.walls[2] = false;
+      } else if (y === -1) { // a is above b
+        a.walls[2] = false;
+        b.walls[0] = false;
+      }
+    }
+
+    // Draw the maze: walls and entrance/exit markers.
+    function drawMaze() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.strokeStyle = '#657b83';
+      ctx.lineWidth = 1;
+      for (let x = 0; x < cols; x++) {
+        for (let y = 0; y < rows; y++) {
+          const cell = grid[x][y];
+          const cx = x * cellSize;
+          const cy = y * cellSize;
+          ctx.beginPath();
+          if (cell.walls[0]) {
+            ctx.moveTo(cx, cy);
+            ctx.lineTo(cx + cellSize, cy);
+          }
+          if (cell.walls[1]) {
+            ctx.moveTo(cx + cellSize, cy);
+            ctx.lineTo(cx + cellSize, cy + cellSize);
+          }
+          if (cell.walls[2]) {
+            ctx.moveTo(cx + cellSize, cy + cellSize);
+            ctx.lineTo(cx, cy + cellSize);
+          }
+          if (cell.walls[3]) {
+            ctx.moveTo(cx, cy + cellSize);
+            ctx.lineTo(cx, cy);
+          }
+          ctx.stroke();
+        }
+      }
+      // Draw entrance and exit markers.
+      const offset = 3;
+      ctx.fillStyle = "#2aa198";
+      ctx.fillRect(0 * cellSize + offset, 0 * cellSize + offset, cellSize - 2 * offset, cellSize - 2 * offset);
+      ctx.fillStyle = "#859900";
+      ctx.fillRect((cols - 1) * cellSize + offset, (rows - 1) * cellSize + offset, cellSize - 2 * offset, cellSize - 2 * offset);
+    }
+
+    // Generate the maze using a depth-first search with optional random restarts.
+    function generateMaze() {
+      if (solverTimeout) {
+        clearTimeout(solverTimeout);
+        solverTimeout = null;
+      }
+      if (loopTimeout) {
+        clearTimeout(loopTimeout);
+        loopTimeout = null;
+      }
+
+      cols = MAZE_WIDTH;
+      rows = MAZE_HEIGHT;
+      cellSize = 20;
+      canvas = document.getElementById('mazeCanvas');
+      canvas.width = cols * cellSize;
+      canvas.height = rows * cellSize;
+      ctx = canvas.getContext('2d');
+
+      grid = new Array(cols);
+      for (let x = 0; x < cols; x++) {
+        grid[x] = new Array(rows);
+        for (let y = 0; y < rows; y++) {
+          grid[x][y] = new Cell(x, y);
+        }
+      }
+
+      const stack = [];
+      let current = grid[0][0];
+      current.visited = true;
+      stack.push(current);
+
+      const randomRestartProbability = 0.1;
+      while (stack.length > 0) {
+        if (Math.random() < randomRestartProbability) {
+          const candidates = [];
+          for (let i = 0; i < cols; i++) {
+            for (let j = 0; j < rows; j++) {
+              if (grid[i][j].visited && grid[i][j].getUnvisitedNeighbor(grid, cols, rows)) {
+                candidates.push(grid[i][j]);
+              }
+            }
+          }
+          if (candidates.length > 0) {
+            current = candidates[Math.floor(Math.random() * candidates.length)];
+            if (!stack.includes(current)) {
+              stack.push(current);
+            }
+          }
+        }
+
+        const next = current.getUnvisitedNeighbor(grid, cols, rows);
+        if (next) {
+          next.visited = true;
+          stack.push(current);
+          removeWalls(current, next);
+          current = next;
+        } else {
+          current = stack.pop();
+        }
+      }
+
+      grid[0][0].walls[0] = false;
+      grid[cols - 1][rows - 1].walls[2] = false;
+
+      for (let x = 0; x < cols; x++) {
+        for (let y = 0; y < rows; y++) {
+          grid[x][y].solverVisited = false;
+        }
+      }
+      drawMaze();
+      // document.getElementById("searchProgress").textContent = "";
+    }
+
+    // Draw the solver's path along the centers of the cells.
+    function drawSolverPath(path) {
+      if (path.length === 0) return;
+      ctx.beginPath();
+      ctx.strokeStyle = "#d33682";
+      ctx.lineWidth = 12;
+      const start = path[0];
+      ctx.moveTo(start.x * cellSize + cellSize / 2, start.y * cellSize + cellSize / 2);
+      for (let i = 1; i < path.length; i++) {
+        const cell = path[i];
+        ctx.lineTo(cell.x * cellSize + cellSize / 2, cell.y * cellSize + cellSize / 2);
+      }
+      ctx.stroke();
+    }
+
+    // Maze solving using DFS, slowed with setTimeout so the animation is easier to follow.
+    function solveMaze() {
+      if (solverTimeout) {
+        clearTimeout(solverTimeout);
+        solverTimeout = null;
+      }
+
+      for (let x = 0; x < cols; x++) {
+        for (let y = 0; y < rows; y++) {
+          grid[x][y].solverVisited = false;
+        }
+      }
+
+      const solverStack = [grid[0][0]];
+      grid[0][0].solverVisited = true;
+
+      // One DFS step per animation update. Raise this to solve faster.
+      const iterationsPerStep = 1;
+
+      function step() {
+        let iterations = 0;
+        let solved = false;
+
+        while (iterations < iterationsPerStep && solverStack.length > 0) {
+          const current = solverStack[solverStack.length - 1];
+
+          if (current.x === cols - 1 && current.y === rows - 1) {
+            solved = true;
+            break;
+          }
+
+          const x = current.x, y = current.y;
+          const neighbors = [];
+
+          if (!current.walls[0] && y > 0 && !grid[x][y - 1].solverVisited)
+            neighbors.push(grid[x][y - 1]);
+          if (!current.walls[1] && x < cols - 1 && !grid[x + 1][y].solverVisited)
+            neighbors.push(grid[x + 1][y]);
+          if (!current.walls[2] && y < rows - 1 && !grid[x][y + 1].solverVisited)
+            neighbors.push(grid[x][y + 1]);
+          if (!current.walls[3] && x > 0 && !grid[x - 1][y].solverVisited)
+            neighbors.push(grid[x - 1][y]);
+
+          if (neighbors.length > 0) {
+            const next = neighbors[0];
+            next.solverVisited = true;
+            solverStack.push(next);
+          } else {
+            solverStack.pop();
+          }
+
+          iterations++;
+        }
+
+        drawMaze();
+        drawSolverPath(solverStack);
+
+        let searchedCells = 0;
+        for (let i = 0; i < cols; i++) {
+          for (let j = 0; j < rows; j++) {
+            if (grid[i][j].solverVisited) searchedCells++;
+          }
+        }
+
+        const totalCells = cols * rows;
+        const percentage = ((searchedCells / totalCells) * 100).toFixed(2);
+
+        if (solved) {
+          loopTimeout = setTimeout(startMazeLoop, NEXT_MAZE_DELAY_MS);
+          return;
+        }
+
+        if (solverStack.length > 0) {
+          solverTimeout = setTimeout(step, SOLVER_DELAY_MS);
+        } else {
+          loopTimeout = setTimeout(startMazeLoop, NEXT_MAZE_DELAY_MS);
+        }
+      }
+
+      solverTimeout = setTimeout(step, SOLVER_DELAY_MS);
+    }
+
+    function startMazeLoop() {
+      generateMaze();
+      solveMaze();
+    }
+
+    window.onload = startMazeLoop;
+  </script>
+</body>
+</html>
