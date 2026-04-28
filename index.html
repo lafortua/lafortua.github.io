@@ -1,10 +1,276 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    
-  </head>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Augustus LaFortune</title>
+  <style>
+    body {
+      margin: 0;
+      background: #5f8196;
+      color: #111;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 14px;
+    }
 
-  <body>
-    
-  </body>
+    a { color: #0b5f8f; font-weight: bold; }
+
+    #page {
+      width: 980px;
+      margin: 0 auto;
+      background: #e8eef0;
+      border-left: 2px solid #8fa7b4;
+      border-right: 2px solid #8fa7b4;
+      min-height: 100vh;
+    }
+
+    #header {
+      background: #54788d;
+      color: white;
+      padding: 12px 18px 6px 18px;
+      border-bottom: 3px solid #d69b16;
+    }
+
+    #site-title {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 38px;
+      font-variant: small-caps;
+      letter-spacing: 1px;
+      text-shadow: 2px 2px #38596c;
+    }
+
+    #top-links {
+      margin-top: 8px;
+      background: #6f7629;
+      border-top: 1px solid #b5bc74;
+      border-bottom: 1px solid #333;
+      padding: 3px 6px;
+      font-size: 13px;
+    }
+
+    #top-links a {
+      color: white;
+      text-decoration: none;
+      margin-right: 22px;
+    }
+
+    #main {
+      display: table;
+      width: 100%;
+      table-layout: fixed;
+    }
+
+    #left-column {
+      display: table-cell;
+      width: 270px;
+      vertical-align: top;
+      background: #d5e1e6;
+      padding: 12px;
+      border-right: 2px solid #9aaeb8;
+    }
+
+    #content {
+      display: table-cell;
+      vertical-align: top;
+      padding: 16px 20px 28px 20px;
+      background: white;
+    }
+
+    .box {
+      background: #fff;
+      border: 1px solid #8a9ca5;
+      margin-bottom: 12px;
+    }
+
+    .box-title {
+      background: #a94b1b;
+      color: white;
+      font-weight: bold;
+      padding: 4px 7px;
+      font-size: 13px;
+    }
+
+    .box-body { padding: 8px; }
+
+    iframe {
+      width: 100%;
+      height: 600px;
+      border: 1px solid #777;
+      background: white;
+    }
+
+    h1 {
+      margin: 0 0 4px 0;
+      font-size: 32px;
+      color: #111;
+    }
+
+    .edited {
+      color: #666;
+      margin-bottom: 24px;
+    }
+
+    h2 {
+      font-size: 22px;
+      color: #333;
+      border-bottom: 1px solid #bbb;
+      padding-bottom: 4px;
+    }
+
+    h3 {
+      font-size: 17px;
+      margin-top: 22px;
+      color: #000;
+    }
+
+    li { margin-bottom: 8px; line-height: 1.35; }
+
+    #footer {
+      text-align: center;
+      color: white;
+      background: #54788d;
+      border-top: 3px solid #d69b16;
+      padding: 10px;
+      font-size: 12px;
+    }
+	
+	.scaled-frame {
+		width: 100%;
+		height: 250px;
+		overflow: hidden;
+		border: 1px solid #777;
+		background: white;
+	}
+
+	.scaled-frame iframe {
+		width: 200%;
+		height: 500px;
+		border: 0;
+		transform: scale(0.5);
+		transform-origin: 0 0;
+	}
+	
+  </style>
+</head>
+<body>
+  <div id="page">
+    <div id="header">
+      <div id="site-title">Augustus LaFortune</div>
+      <div id="top-links">
+        <a href="#">Home</a>
+        <a href="#">Projects</a>
+        <a href="#">Data</a>
+        <a href="#">Contact</a>
+      </div>
+    </div>
+
+    <div id="main">
+      <div id="left-column">
+        <div class="box">
+          <div class="box-title">About</div>
+          <div class="box-body">
+            <strong>Augustus LaFortune</strong><br>
+            <a href="https://github.com/" target="_blank">View My GitHub Profile</a>
+          </div>
+        </div>
+
+        <div class="box">
+          <div class="box-title">Boids!</div>
+          <div class="box-body">
+            <!-- Change the src below to embed another local HTML file or web page. -->
+            <div class="scaled-frame">
+              <iframe src="html_boids.html" title="Embedded content"></iframe>
+            </div>
+
+            <!-- Second embedded page (maze) below the first -->
+            
+          </div>
+        </div>
+
+        <div class="box">
+          <div class="box-title">A-Maze!</div>
+          <div class="box-body">
+            <!-- Put small hand-written HTML snippets here. -->
+            <div style="margin-top:10px;">
+              <div class="scaled-frame">
+                <iframe src="html_maze_solver.html" title="Maze solver"></iframe>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="content">
+		<details>
+			<summary><strong>Final Project Ideas:</strong></summary>
+			<h3>1. Library occupancy</h3>
+			<ul>
+				<li>I already <a href="https://docs.google.com/spreadsheets/d/1W0Ir9_vkeeeAdqxTlNZ9y3OYto_xcfIPKoz45YwRwQ4/edit?usp=sharing" rel="nofollow">have this data</a> recorded at 10 minute intervals since 5/18/2025. I can combine this data with other things such as a list of courses (when they start and end), the weather, the college calendar, and the events calendar.</li>
+				<li><u>Questions to answer:</u> Does weather affect library occupancy? Does the occupancy level change throughout the semester due to increased workload as the semester progresses?</li>
+			</ul>
+
+			<h3>2. Word analysis of TV show</h3>
+			<ul>
+				<li>Inspect script of a TV show. If inspecting more than one script, then compare them in terms of words used, words per line, or sentiment.</li>
+				<li>I have found a full transcript of both <a href="https://subslikescript.com/series/Cheers-83399" rel="nofollow">Cheers</a> and <a href="https://bradlindblad.github.io/schrute/" rel="nofollow">The Office (U.S.)</a>. The one for The Office is much more detailed, including the speaking character's name, the names of the writers of the episode, the IMDB rating of the episode, the air-date, etc. It also is already organized into a single file. The one for Cheers is much more simple, only plainly listing the lines in the order they were spoken and in what episode. However, I could combine this data with IMDB data of the episode.</li>
+				<li><u>Questions to answer:</u> Does the sentiment of the dialogue in an episode correlate to the IMDB rating for the episode? Do different rating websites exhibit the same behavior, or are some more influenced by sentiment than others? Does the frequency of a name being used in an episode correlate to the ratings for the episode?</li>
+			</ul>
+
+			<h3>3. Whitman Campus trees</h3>
+			<ul>
+			  <li>I know that there is a dataset of (almost) all trees on the Whitman campus that, for each tree, includes its species name, family name, common name, leaf fall, and geographic coordinates. (I know that there is such a dataset because I have found an <a href="https://github.com/Luckykhoza1/WhitmanTrees-Demo">unfinished GitHub project</a> that uses the dataset of over 6,000 trees.)</li>
+			  <li>I can combine this dataset with things like data of campus building footprints (easily found in OpenStreetMap).</li>
+			  <li><u>Questions to answer</u>: Does the type of tree correlate to its distance from the closest building? Does the type of tree correlate to its location on campus?</li>
+			</ul>
+		</details>
+
+		<details>
+			<summary><strong>Week 10 Update</strong></summary>
+			<ul>
+				<li>I have settled on doing word analysis of a TV show as my topic for the final project.</li>
+				<li>I will be doing this project by myself.</li>
+				<li>I am going to look at things like how often two words appear in the same line, the frequency of names throughout the series, etc.</li>
+				<li>I am either going to use a transcript for the TV show Cheers, or The Office. In preparation for this project I wrote a webcrawler using jsoup for Java to get all of the transcripts for Cheers from a TV show transcripts website. The program organized all of the lines into a single .csv file that, for each line, includes the season number, episode number, and episode title. I could probably combine this dataset with another dataset such as the IMDB rating for each episode. However, some of the episodes have single letters swapped for others (for example, in some episode the letter "I" is replaced by "l"). I think that this is possible to fix in some cases and will not be very consequential in other cases. Alternatively, I could use an existing, clean, and well organized dataset of the lines from The Office. For each line, this dataset includes everything my Cheers dataset does, in addition to the writer of the episode, the director of the episode, the character who speaks the line, a version of the line that includes acting direction (such as "walk away"), the IMDB rating of the episode, the number of ratings for the episode, and the date that the episode aired. However, I worry that this will not be as interesting of a dataset to work with because <a href="https://www.jennadallen.com/post/text-analytics-every-line-from-the-office/" rel="nofollow">it has already been analysed multiple times before</a>.</li>
+				<li>Three questions I want to explore: Which character's name appears in the same line as the word "beer" the most? (I suspect it would be the character named Norm, but perhaps it is one of the waiters or bartenders). Which character's name appears the most in lines that end with "!". What about "?". Does the sentiment of the lines change throughout the series? (Judging sentiment using automatic sentiment analysis.)</li>
+			</ul>
+		</details>
+		
+		<details>
+			<summary><strong>Week 11 Update</strong></summary>
+			<ul>
+				<li>I decided to work with the transcripts of the TV show Cheers. While the data is not as available as for the TV show The Office, I enjoyed the challenge of compiling the data and cleaning it up.</li>
+				<li>I obtained data from two different sources. The first source was <a href="https://subslikescript.com/series/Cheers-83399" rel="nofollow">this website</a> which gave me the transcripts of all episodes in the series. I wrote my own java code that uses the Jsoup library to download the individual lines directly from the website. In this step I recorded the line, the season and episode number, and the name of the episode. Last week I mentioned that there were some errors such as the letter "l" being in places where the letter "I" should be sometimes. I wrote my own java code that fixed many of these errors. I also got information from IMDb using Jsoup and my own java code. This was more difficult however because the website doesn't just use html to work. I was able to easily download the loaded page as html and then parse and clean the information from there. This is how I got the information on air date, rating, and number of votes for that rating. I then wrote some more java code that combined these two datasets into a single csv file (using a semicolon as the delimiter) with 111,697 rows and 7 columns. There is one line on each row, and the columns are organized as: line text, season number, episode number, episode title, air date, rating (out of 10), and the number of people that voted for that rating.</li>
+				<li>One limitation with this dataset is that I do not know which character is speaking the line. This means I can not do specific character dialogue analysis like seeing if Norm says the word "beer" more than the average character on the show. I see this as an interesting challenge and I think that I will be able to get meaningfull data in different ways such as seeing if Norm's name appears more often than other names in the sentences around one that includes the word "beer."</li>
+				<li>I have already found interesting things about even just the frequency of the names of characters. For example, "Norm" is spoken 1421 times and "Norman" is spoken 156 time, while "Cliff" is spoken 1114 times and "Clifford" is spoken 94 times. Norm's name is not only spoken more than Cliff's, but when people say Norm's name,  ~10% of the time they say his full first name while when people say Cliff's name, ~8% of the time they say his full first name.</li>
+			</ul>
+		</details>
+		
+		<details>
+			<summary><strong>Departure Delays Map</strong></summary>
+			<div>
+				<iframe src="Alaska_destinations_delays.html"
+					width="100%"
+					height="900">
+				</iframe>
+			</div>
+		</details>
+
+        <details>
+			<summary><strong>Week 12 Update</strong></summary>
+			<ul dir="auto">
+                <li>Since I started working with this dataset, I have been wondering if there really is a correlation between Norm and beer that is reflected purely in the dialogue. (In the show, Norm is a lover of beer.) I used a python function to determine the correlation after I had found the instances of each character's name as well as the word beer. I also widdened the range of lines that would be considered related to the character names. By that I mean that if Norm was mentioned in line 5, I would also include lines 4 and 6 as lines that are related to Norm. Also, for each character, I made sure to also include their last name when looking for instances of thier name appearing.</li>
+            </ul>
+            <div>
+                <iframe src="beer_correlation.html"></iframe>
+            </div>
+
+		</details>
+	  
+	  </div>
+    </div>
+
+    <div id="footer">
+      Hosted on GitHub Pages
+    </div>
+  </div>
+</body>
 </html>
