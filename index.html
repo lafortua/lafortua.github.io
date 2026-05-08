@@ -256,6 +256,18 @@
             </div>
 
 		</details>
+
+		<details open>
+            <summary><strong>Week 14 Update</strong></summary>
+            <ul>
+                <li>So far with my project I have completed all the data collection, cleanup, and combining different datasets. I have also done some analysis and visualization.</li>
+                <li>The first analysis that I performed was to calculate and compare the correlation between each of the main cast of characters and the word 'beer.' My hypothesis was that the character Norm would by far have the strongest positive correlation out of the characters. I was correct. I have since done p-value tests on this which proved the correlation to be statistically significant even though it is a relatively weak correlation with a correlation coefficient of less than 0.1.</li>
+                <li>Last week I performed TF-IDF analysis. This did not give me data that I found very meaningful. This week, I took the spirit of this analysis further by calculating the log likelihood ratio of each word from the transcript and a dataset called the SUBTLEX-US corpus. The <a href="https://www.ugent.be/pp/experimentele-psychologie/en/research/documents/subtlexus" rel="nofollow">SUBTLEX-US corpus</a> that I am using has word frequency data for about 74 thousand words. The frequency information is based on American English subtitles. This makes it especially relevant to what I am doing (unlike a dataset created from written works). The LL analysis shows me which words are relatively unique to Cheers as a whole, not just unique relative to each line in Cheers (which is what the TF-IDF analysis shows me).</li>
+                <li>I still plan to also include the sentiment analysis of the text. It could be interesting to explore the correlations between sentiment score and word topic.</li>
+                <li>The log likelihood analysis is the new technique that I am learning for this project. I first learned about it by reading about similar analysies that people have done in the past. I learned more about its uses and how to implement it by reading web articles and project documentation.</li>
+                <li>To communicate my project, I plan to create an interactive web page that allows people to explore the corellation between each character and any of the top words unique to the tv show.</li>
+        	</ul>
+        </details>
 	  
 	  </div>
     </div>
